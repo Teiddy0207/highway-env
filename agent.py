@@ -47,9 +47,8 @@ class DQNAgent:
         if use_random and np.random.rand() < self.epsilon:
             return np.random.randint(self.action_dim)
 
-        state = torch.FloatTensor(state).unsqueeze(0).to(self.device)  # (1, 5, 5)
-        state_flat = state.view(state.size(0), -1)                     # (1, 25)
-        q_values = self.q_net(state_flat).detach().cpu().numpy()[0]
+        state = torch.FloatTensor(state).unsqueeze(0).to(self.device)  # (1, 18)
+        q_values = self.q_net(state).detach().cpu().numpy()[0]
         return np.argmax(q_values)
 
     def remember(self, state, action, reward, next_state, done):
@@ -61,15 +60,15 @@ class DQNAgent:
 
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
 
-        states = torch.FloatTensor(states).to(self.device)              # (batch, 5, 5)
+        states = torch.FloatTensor(states).to(self.device)              # (batch, 18)
         actions = torch.LongTensor(actions).to(self.device).squeeze(1)  # (batch,) - chuyển từ (batch,1)
         rewards = torch.FloatTensor(rewards).to(self.device)            # (batch,)
-        next_states = torch.FloatTensor(next_states).to(self.device)    # (batch, 5, 5)
+        next_states = torch.FloatTensor(next_states).to(self.device)    # (batch, 18)
         dones = torch.FloatTensor(dones).to(self.device)                # (batch,)
 
-        # Flatten states cho Q-network
-        states_flat = states.view(states.size(0), -1)                   # (batch, 25)
-        next_states_flat = next_states.view(next_states.size(0), -1)    # (batch, 25)
+        # States đã là 1D, không cần flatten
+        states_flat = states      # (batch, 18)
+        next_states_flat = next_states  # (batch, 18)
 
         # Q(s,a)
         q_values = self.q_net(states_flat).gather(1, actions.unsqueeze(1)).squeeze(1)     # (batch,)
