@@ -2,6 +2,7 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 import random
+import pygame
 
 class TaxiEnvironment(gym.Env):
     """
@@ -49,6 +50,13 @@ class TaxiEnvironment(gym.Env):
         self.collision_penalty = -5
         self.slow_penalty = -0.1
         self.speed_reward = 1
+
+        # --- Thêm pygame attributes để render ---
+        self.screen = None
+        self.width = 600
+        self.height = 400
+        self.lane_height = self.height // self.num_lanes
+        self.clock = None
         
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
@@ -185,10 +193,44 @@ class TaxiEnvironment(gym.Env):
         """Kiểm tra điều kiện kết thúc episode"""
         return self._check_collision()
     
+    # def render(self, mode='human'):
+    #     """Hiển thị môi trường (đơn giản)"""
+    #     if mode == 'human':
+    #         print(f"Taxi: Pos={self.taxi_position:.1f}, Lane={self.taxi_lane}, Speed={self.taxi_speed:.1f} km/h")
+    #         for i, car in enumerate(self.other_cars):
+    #             print(f"Car {i}: Pos={car['position']:.1f}, Lane={car['lane']}, Speed={car['speed']:.1f} km/h")
+    #         print("-" * 50)
+
     def render(self, mode='human'):
-        """Hiển thị môi trường (đơn giản)"""
-        if mode == 'human':
-            print(f"Taxi: Pos={self.taxi_position:.1f}, Lane={self.taxi_lane}, Speed={self.taxi_speed:.1f} km/h")
-            for i, car in enumerate(self.other_cars):
-                print(f"Car {i}: Pos={car['position']:.1f}, Lane={car['lane']}, Speed={car['speed']:.1f} km/h")
-            print("-" * 50)
+        if self.screen is None:
+            pygame.init()
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            pygame.display.set_caption("Taxi Environment")
+            self.clock = pygame.time.Clock()
+
+        # Vẽ nền đường
+        self.screen.fill((50, 50, 50))
+
+        # Vẽ các làn
+        for lane in range(1, self.num_lanes):
+            y = lane * self.lane_height
+            pygame.draw.line(self.screen, (255, 255, 255), (0, y), (self.width, y), 2)
+
+        # Tỉ lệ chuyển từ position → pixel
+        scale = self.width / self.road_length
+
+        # Vẽ taxi (màu vàng)
+        taxi_x = int(self.taxi_position * scale)
+        taxi_y = self.taxi_lane * self.lane_height + self.lane_height // 4
+        pygame.draw.rect(self.screen, (255, 255, 0), (taxi_x, taxi_y, 30, self.lane_height // 2))
+
+        # Vẽ các xe khác (màu đỏ)
+        for car in self.other_cars:
+            car_x = int(car['position'] * scale)
+            car_y = car['lane'] * self.lane_height + self.lane_height // 4
+            pygame.draw.rect(self.screen, (200, 0, 0), (car_x, car_y, 30, self.lane_height // 2))
+
+        # Update màn hình
+        pygame.display.flip()
+        self.clock.tick(30)
+

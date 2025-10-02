@@ -164,10 +164,5 @@ python evaluation/compare_algorithms.py
 - **Đánh giá công bằng**: Cùng điều kiện test
 - **Documentation**: Ghi rõ thuật toán và kết quả
 
-## 📞 Liên hệ
 
-Nếu có thắc mắc, tạo issue hoặc liên hệ team leader.
 
----
-
-**Happy Coding! 🚕✨**
