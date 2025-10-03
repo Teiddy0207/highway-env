@@ -1,20 +1,20 @@
-# 🚕 Taxi Reinforcement Learning Project
+# 🛣️ Highway Reinforcement Learning Project
 
-Dự án so sánh các thuật toán Reinforcement Learning cho bài toán lái xe taxi tự động.
+Dự án huấn luyện AI lái xe trên đường cao tốc với agent màu xanh lá.
 
 ## 📋 Mô tả
 
-Hệ thống huấn luyện AI lái xe taxi với mục tiêu:
+Hệ thống huấn luyện AI lái xe trên highway với mục tiêu:
 - Duy trì tốc độ tối ưu (30-40 km/h)
 - Tránh va chạm với các xe khác
 - Chuyển làn an toàn
 - Di chuyển hiệu quả
 
-## 🎮 Môi trường
+## 🎮 Môi trường Highway
 
 ### Trạng thái (State):
-- **18 chiều**: Vị trí, tốc độ, làn đường của taxi + thông tin 5 xe khác
-- **Format**: `[taxi_pos, taxi_lane, taxi_speed, car1_pos, car1_lane, car1_speed, ...]`
+- **27 chiều**: Vị trí, tốc độ, làn đường của agent + thông tin 8 xe khác
+- **Format**: `[agent_pos, agent_lane, agent_speed, car1_pos, car1_lane, car1_speed, ...]`
 
 ### Hành động (Actions):
 - `0`: Giữ nguyên
@@ -25,18 +25,21 @@ Hệ thống huấn luyện AI lái xe taxi với mục tiêu:
 
 ### Reward System:
 - `+1`: Tốc độ đúng mục tiêu (30-40 km/h)
-- `-5`: Va chạm
+- `-10`: Va chạm
 - `-0.1`: Đi quá chậm
 - `+0.1`: Tiến về phía trước
+- `+0.05`: Ở giữa đường (tránh biên)
 
 ## 🏗️ Cấu trúc dự án
 
 ```
 highway/
-├── agent.py              # Thuật toán RL (mỗi branch khác nhau)
-├── taxi_environment.py   # Môi trường taxi (dùng chung)
-├── main.py              # Script huấn luyện và demo
-├── replay_buffer.py     # Bộ nhớ cho DQN
+├── agent.py              # Thuật toán DQN
+├── highway_environment.py # Môi trường highway với agent màu xanh lá
+├── highway_demo.py        # Demo với model đã huấn luyện
+├── main.py               # Script huấn luyện chính
+├── replay_buffer.py      # Bộ nhớ cho DQN
+├── test_highway.py       # Test môi trường highway
 └── README.md
 ```
 
@@ -44,125 +47,54 @@ highway/
 
 ### 1. Cài đặt dependencies:
 ```bash
-pip install torch numpy gymnasium
+pip install torch numpy gymnasium matplotlib
 ```
 
-### 2. Chạy huấn luyện:
+### 2. Test môi trường:
+```bash
+python test_highway.py
+```
+
+### 3. Demo với model đã huấn luyện:
+```bash
+python highway_demo.py
+```
+
+### 4. Huấn luyện mới:
 ```bash
 python main.py
 ```
 
-**Chọn:**
-- `1`: Huấn luyện mới
-- `2`: Demo với model đã lưu
+## 🎨 Visualization
 
-### 3. Test môi trường:
-```bash
-python test_taxi.py
-```
+- **Agent màu xanh lá**: Xe được điều khiển bởi AI
+- **Các xe khác**: Màu sắc khác nhau, di chuyển tự động
+- **4 làn đường**: Môi trường highway thực tế
+- **Real-time**: Hiển thị vị trí, tốc độ, làn đường
 
-## 🌳 Git Workflow
+## 📊 Đặc điểm
 
-### Branch Strategy:
-- `main`: Code gốc với DQN
-- `dqn-algorithm`: Cải thiện DQN
-- `ppo-algorithm`: Implement PPO
-- `a3c-algorithm`: Implement A3C
-
-### Cho mỗi thành viên:
-
-1. **Clone repo:**
-```bash
-git clone <repo-url>
-cd highway
-```
-
-2. **Tạo branch riêng:**
-```bash
-git checkout -b your-algorithm-name
-```
-
-3. **Implement thuật toán:**
-- Sửa `agent.py` → implement thuật toán của bạn
-- Có thể sửa `main.py` nếu cần
-- **KHÔNG sửa** `taxi_environment.py` (môi trường chung)
-
-4. **Test:**
-```bash
-python main.py
-```
-
-5. **Commit & Push:**
-```bash
-git add .
-git commit -m "Implement [Algorithm] for taxi"
-git push origin your-algorithm-name
-```
-
-6. **Tạo Pull Request**
-
-## 📊 Đánh giá thuật toán
-
-### Metrics so sánh:
-- **Average Reward**: Tổng reward trung bình
-- **Success Rate**: Tỷ lệ hoàn thành episode không va chạm
-- **Average Steps**: Số bước trung bình mỗi episode
-- **Training Time**: Thời gian huấn luyện
-- **Convergence**: Tốc độ hội tụ
-
-### Cách đánh giá:
-```bash
-# Chạy evaluation cho tất cả thuật toán
-python evaluation/compare_algorithms.py
-```
-
-## 🔧 Cấu hình
-
-### Tham số môi trường:
-- **Road length**: 100 đơn vị
-- **Number of lanes**: 3
-- **Max speed**: 50 km/h
+### Môi trường Highway:
+- **Road length**: 200 mét
+- **Number of lanes**: 4
+- **Max speed**: 60 km/h
 - **Target speed**: 30-40 km/h
-- **Number of other cars**: 5
+- **Number of other cars**: 8
 
-### Tham số huấn luyện:
-- **Episodes**: 300
-- **Max steps per episode**: 200
+### Thuật toán DQN:
+- **State dimension**: 27
+- **Action dimension**: 5
 - **Learning rate**: 1e-3
 - **Epsilon decay**: 0.995
 - **Batch size**: 64
 
-## 📈 Kết quả mong đợi
+## 🎯 Kết quả mong đợi
 
-### DQN:
-- Học cách duy trì tốc độ tối ưu
-- Sử dụng experience replay
-- Epsilon-greedy exploration
-
-### PPO:
-- Policy gradient method
-- Stable learning
-- Good sample efficiency
-
-### A3C:
-- Asynchronous learning
-- Actor-Critic architecture
-- Parallel training
-
-## 🤝 Đóng góp
-
-1. Fork repository
-2. Tạo feature branch
-3. Implement thuật toán
-4. Test kỹ lưỡng
-5. Tạo Pull Request
-
-## 📝 Lưu ý
-
-- **Môi trường chung**: Tất cả thuật toán dùng cùng `taxi_environment.py`
-- **Interface chung**: Cùng format input/output
-- **Đánh giá công bằng**: Cùng điều kiện test
-- **Documentation**: Ghi rõ thuật toán và kết quả
+Agent màu xanh lá sẽ học được:
+- Duy trì tốc độ tối ưu
+- Tránh va chạm thông minh
+- Chuyển làn an toàn
+- Di chuyển hiệu quả trên highway
 
 ## 📞 Liên hệ
 
@@ -170,4 +102,4 @@ Nếu có thắc mắc, tạo issue hoặc liên hệ team leader.
 
 ---
 
-**Happy Coding! 🚕✨**
+**Happy Coding! 🛣️✨**

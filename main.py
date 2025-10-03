@@ -1,21 +1,21 @@
 import time
 import torch
 from agent import DQNAgent
-from taxi_environment import TaxiEnvironment
+from highway_environment import HighwayEnvironment
 
 
 def train():
-    """Huấn luyện taxi agent"""
-    env = TaxiEnvironment()
-    state_dim = env.observation_space.shape[0]  # 18
+    """Huấn luyện highway agent (xe màu xanh lá)"""
+    env = HighwayEnvironment(render_mode='human')
+    state_dim = env.observation_space.shape[0]  # 63
     action_dim = env.action_space.n             # 5
 
     agent = DQNAgent(state_dim, action_dim, lr=1e-3, epsilon_start=1.0, epsilon_end=0.01)
 
-    episodes = 300  # Giảm số episodes để test nhanh hơn
-    print("🚕 Bắt đầu huấn luyện taxi agent...")
-    print(f"📊 State dim: {state_dim}, Action dim: {action_dim}")
-    print("🎯 Mục tiêu: Duy trì tốc độ 30-40 km/h, tránh va chạm")
+    episodes = 200
+    print("🛣️ Bắt đầu huấn luyện highway agent ...")
+    print(f" State dim: {state_dim}, Action dim: {action_dim}")
+    print(" Mục tiêu: Duy trì tốc độ 30-40 km/h, tránh va chạm")
     print("=" * 60)
 
     for ep in range(episodes):
@@ -47,21 +47,21 @@ def train():
             print(f"Episode {ep:3d} | Reward: {total_reward:6.2f} | Steps: {steps:3d} | Epsilon: {agent.epsilon:.3f}")
 
     # Lưu model
-    torch.save(agent.q_net.state_dict(), 'taxi_dqn_model.pth')
-    print(f"\n💾 Model đã được lưu: taxi_dqn_model.pth")
+    torch.save(agent.q_net.state_dict(), 'highway_dqn_model.pth')
+    print(f"\n💾 Model đã được lưu: highway_dqn_model.pth")
     
     return agent
 
 
 def demo(agent):
-    """Demo taxi agent đã được huấn luyện"""
-    env = TaxiEnvironment()
+    """Demo highway agent đã được huấn luyện (xe màu xanh lá)"""
+    env = HighwayEnvironment(render_mode='human')
     state, _ = env.reset()
     done = False
     total_reward = 0
     steps = 0
 
-    print("\n🚕 Demo taxi agent...")
+    print("\n🛣️ Demo highway agent (xe màu xanh lá)...")
     print("Hành động: 0=Giữ nguyên, 1=Tăng tốc, 2=Giảm tốc, 3=Chuyển trái, 4=Chuyển phải")
     print("=" * 60)
 
@@ -86,14 +86,14 @@ def demo(agent):
 
 def load_and_demo():
     """Load model đã lưu và chạy demo"""
-    env = TaxiEnvironment()
+    env = HighwayEnvironment(render_mode='human')
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
     
     agent = DQNAgent(state_dim, action_dim)
     
     try:
-        agent.q_net.load_state_dict(torch.load('taxi_dqn_model.pth'))
+        agent.q_net.load_state_dict(torch.load('highway_dqn_model.pth'))
         print("✅ Đã load model đã huấn luyện")
     except:
         print("⚠️ Không tìm thấy model, sử dụng weights ngẫu nhiên")
@@ -102,7 +102,7 @@ def load_and_demo():
 
 
 if __name__ == "__main__":
-    print("🚕 TAXI DQN TRAINING SYSTEM")
+    print("🛣️ HIGHWAY DQN TRAINING SYSTEM")
     print("1. Huấn luyện mới")
     print("2. Demo với model đã lưu")
     
