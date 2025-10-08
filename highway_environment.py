@@ -22,16 +22,16 @@ class HighwayEnvironment(gym.Env):
         self.road_length = 200  # Chiều dài đường
         self.num_lanes = 4      # Số làn đường
         self.lane_width = 3.5   # Chiều rộng làn đường (mét)
-        self.max_speed = 60     # Tốc độ tối đa (km/h)
-        self.target_speed_min = 30  # Tốc độ mục tiêu tối thiểu
-        self.target_speed_max = 40  # Tốc độ mục tiêu tối đa
+        self.max_speed = 80     # Tốc độ tối đa (km/h)
+        self.target_speed_min = 60  # Tốc độ mục tiêu tối thiểu
+        self.target_speed_max = 55  # Tốc độ mục tiêu tối đa
 
         # Tốc độ cao tốc 80
         # Trạng thái agent (xe màu xanh lá)
         self.agent_position = 0      # Vị trí trên đường
         self.agent_lane = 1           # Làn đường (0, 1, 2, 3)
         self.agent_speed = 0          # Tốc độ hiện tại
-        self.agent_color = 'aquamarine'    # Màu xanh lá
+        self.agent_color = 'green'    # Màu xanh lá
         
         # Các xe khác
         self.other_cars = []          # Danh sách xe khác
@@ -86,9 +86,7 @@ class HighwayEnvironment(gym.Env):
     def _generate_other_cars(self):
         """Tạo các xe khác trên đường"""
         self.other_cars = []
-        car_colors = ['red', 'blue', 'orange', 'purple', 'brown', 'pink', 'gray', 'yellow', 
-                     'cyan', 'magenta', 'lime', 'navy', 'maroon', 'olive', 'teal', 'silver',
-                     'gold', 'coral', 'indigo', 'violet']
+        car_colors = ['black']
         #xa khác đổi sang trắng hoặc đen (emo)
         
         for i in range(self.num_other_cars):
