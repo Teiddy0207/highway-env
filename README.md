@@ -5,7 +5,7 @@ Dự án huấn luyện AI lái xe trên đường cao tốc với agent màu xa
 ## 📋 Mô tả
 
 Hệ thống huấn luyện AI lái xe trên highway với mục tiêu:
-- Duy trì tốc độ tối ưu (30-40 km/h)
+- Duy trì tốc độ tối ưu (60-80 km/h)
 - Tránh va chạm với các xe khác
 - Chuyển làn an toàn
 - Di chuyển hiệu quả
@@ -103,3 +103,15 @@ Nếu có thắc mắc, tạo issue hoặc liên hệ team leader.
 ---
 
 **Happy Coding! 🛣️✨**
+
+Code trên nhánh tạo ra từ nhán dev
+Mỗi nhánh là 1 thuật toán
+B1 clone code
+B2 git check out develop
+B3 git branch (Kiểm tra nhánh hiện tại)
+B4 git pull origin develop
+5 git checkout -b feature/add-login
+Tạo nhánh đúng format feature/(tên thuật toán)
+
+phát triển thuật toán trong file agent
+và thay đổi main sao cho phù hợp
