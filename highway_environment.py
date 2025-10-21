@@ -24,7 +24,7 @@ class HighwayEnvironment(gym.Env):
         self.lane_width = 3.5   # Chiều rộng làn đường (mét)
         self.max_speed = 80     # Tốc độ tối đa (km/h)
         self.target_speed_min = 60  # Tốc độ mục tiêu tối thiểu
-        self.target_speed_max = 55  # Tốc độ mục tiêu tối đa
+        self.target_speed_max = 80  # Tốc độ mục tiêu tối đa
 
         # Tốc độ cao tốc 80
         # Trạng thái agent (xe màu xanh lá)

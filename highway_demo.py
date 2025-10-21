@@ -6,7 +6,7 @@ Demo script để huấn luyện và sử dụng model cho Highway Environment
 
 import numpy as np
 import torch
-from agent import DQNAgent
+from ppo_agent import DQNAgent
 from highway_environment import HighwayEnvironment
 
 def quick_train():
