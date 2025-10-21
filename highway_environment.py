@@ -24,7 +24,7 @@ class HighwayEnvironment(gym.Env):
         self.lane_width = 3.5   # Chiều rộng làn đường (mét)
         self.max_speed = 80     # Tốc độ tối đa (km/h)
         self.target_speed_min = 60  # Tốc độ mục tiêu tối thiểu
-        self.target_speed_max = 55  # Tốc độ mục tiêu tối đa
+        self.target_speed_max = 70  # Tốc độ mục tiêu tối đa
 
         # Tốc độ cao tốc 80
         # Trạng thái agent (xe màu xanh lá)
@@ -52,12 +52,12 @@ class HighwayEnvironment(gym.Env):
             low=0, high=100, shape=(obs_dim,), dtype=np.float32
         )
         
-        # Reward parameters
-        #note: trừ nặng hơn khi va chạm
+        # Reward parameters - Cải thiện để học nhanh hơn
         self.collision_penalty = -5
         self.slow_penalty = -0.1
         self.speed_reward = 1
-        self.progress_reward = 0.1
+        self.progress_reward = 0.1  # Reward cho ở giữa đường
+        self.lane_center_reward = 0.05  # Reward cho việc ở làn giữa
         
         # Visualization
         self.render_mode = render_mode
@@ -179,28 +179,41 @@ class HighwayEnvironment(gym.Env):
                 car['speed'] = random.uniform(25, 50)
     
     def _calculate_reward(self, old_position, old_lane, old_speed):
-        """Tính reward dựa trên hành vi"""
+        """Tính reward dựa trên hành vi - Cải thiện để học nhanh hơn"""
         reward = 0
         
         # 1. Reward cho tốc độ đúng mục tiêu (30-40 km/h)
         if self.target_speed_min <= self.agent_speed <= self.target_speed_max:
             reward += self.speed_reward
+        else:
+            # Penalty cho tốc độ không đúng mục tiêu
+            speed_diff = abs(self.agent_speed - (self.target_speed_min + self.target_speed_max) / 2)
+            reward -= speed_diff * 0.1
         
         # 2. Penalty cho tốc độ quá chậm
         if self.agent_speed < self.target_speed_min:
             reward += self.slow_penalty
         
-        # 3. Penalty cho va chạm
+        # 3. Penalty cho va chạm (trừ nặng)
         if self._check_collision():
             reward += self.collision_penalty
         
         # 4. Bonus cho việc tiến về phía trước
-        if self.agent_position > old_position:
-            reward += self.progress_reward
+        progress = self.agent_position - old_position
+        if progress > 0:
+            reward += self.progress_reward * progress  # Tỷ lệ với khoảng cách di chuyển
         
-        # 5. Bonus nhỏ cho việc ở giữa đường (tránh biên)
+        # 5. Bonus cho việc ở giữa đường (tránh biên)
         if 1 <= self.agent_lane <= 2:
-            reward += 0.05
+            reward += self.lane_center_reward
+        
+        # 6. Bonus cho việc duy trì tốc độ ổn định
+        if abs(self.agent_speed - old_speed) < 2:  # Tốc độ ổn định
+            reward += 0.1
+        
+        # 7. Penalty cho việc dừng lại quá lâu
+        if self.agent_speed < 5 and progress < 0.1:
+            reward -= 0.5
         
         return reward
     

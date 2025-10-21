@@ -24,8 +24,8 @@ class DoubleDQNAgent:
     """
     def __init__(self, state_dim, action_dim, capacity=10000, batch_size=64, gamma=0.99, lr=1e-3,
                  epsilon_start=1.0, epsilon_end=0.05, epsilon_decay=0.995, device="cpu"):
-        self.state_dim = state_dim
-        self.action_dim = action_dim
+        self.state_dim = state_dim #63
+        self.action_dim = action_dim #5
         self.gamma = gamma
         self.batch_size = batch_size
         self.device = torch.device(device)

@@ -6,9 +6,9 @@ from agent_ddqn import DoubleDQNAgent
 from highway_environment import HighwayEnvironment
 
 
-def train(algorithm='dqn'):
+def train(algorithm='dqn', episodes=200, render_mode='human', auto_close=True, pause_every=10):
     """Huấn luyện highway agent với thuật toán được chọn"""
-    env = HighwayEnvironment(render_mode='human')
+    env = HighwayEnvironment(render_mode=render_mode)
     state_dim = env.observation_space.shape[0]  # 63
     action_dim = env.action_space.n             # 5
 
@@ -24,9 +24,10 @@ def train(algorithm='dqn'):
     else:
         raise ValueError(f"Thuật toán không hỗ trợ: {algorithm}")
 
-    episodes = 200
     print(f"🛣️ Bắt đầu huấn luyện highway agent với {algo_name}...")
     print(f" State dim: {state_dim}, Action dim: {action_dim}")
+    print(f" Episodes: {episodes}")
+    print(f" Tạm dừng mỗi {pause_every} episodes để tránh máy nóng")
     print(" Mục tiêu: Duy trì tốc độ 30-40 km/h, tránh va chạm")
     print("=" * 60)
 
@@ -54,12 +55,33 @@ def train(algorithm='dqn'):
         if ep % 10 == 0:
             agent.update_target()
 
-        # In thông tin mỗi 50 episodes
-        if ep % 50 == 0 or ep < 10:
+        # In thông tin mỗi 10 episodes
+        if ep % 10 == 0 or ep < 5:
             print(f"Episode {ep:3d} | Reward: {total_reward:6.2f} | Steps: {steps:3d} | Epsilon: {agent.epsilon:.3f}")
 
-    # Lưu model
+        # Tạm dừng và tắt model mỗi pause_every episodes
+        if (ep + 1) % pause_every == 0 and ep < episodes - 1:
+            print(f"\n⏸️  Tạm dừng sau {ep + 1} episodes...")
+            print("💾 Đang lưu model tạm thời...")
+            agent.save_model(f'temp_{model_name}')
+            
+            if auto_close:
+                env.close()
+                print("🔄 Model đã được tắt để tránh máy nóng")
+                print("⏳ Chờ 3 giây trước khi tiếp tục...")
+                time.sleep(3)
+                
+                # Tạo lại environment
+                env = HighwayEnvironment(render_mode=render_mode)
+                print("✅ Đã khởi động lại model")
+
+    # Lưu model cuối cùng
     agent.save_model(model_name)
+    print(f"\n💾 Model cuối cùng đã được lưu: {model_name}")
+    
+    if auto_close:
+        env.close()
+        print("🔚 Training hoàn thành, model đã được tắt")
     
     return agent
 
