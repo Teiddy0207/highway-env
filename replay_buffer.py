@@ -10,11 +10,12 @@ class ReplayBuffer:
         self.buffer.append((state, action, reward, next_state, done))
 
     def sample(self, batch_size):
-        batch = np.random.choice(len(self.buffer), batch_size, replace=False)
-        states, actions, rewards, next_states, dones = zip(*[self.buffer[idx] for idx in batch])
+        indices = np.random.choice(len(self.buffer), batch_size, replace=False)
+        batch = [self.buffer[idx] for idx in indices]
+        states, actions, rewards, next_states, dones = zip(*batch)
         return (
             np.array(states, dtype=np.float32),
-            np.array(actions, dtype=np.int64).reshape(-1, 1),   # 🔥 ép thành (batch,1)
+            np.array(actions, dtype=np.int64),
             np.array(rewards, dtype=np.float32),
             np.array(next_states, dtype=np.float32),
             np.array(dones, dtype=np.float32),
